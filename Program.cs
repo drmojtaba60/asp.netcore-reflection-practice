@@ -86,11 +86,15 @@ app.MapGet("/enums/myenum2-by-names", () =>
             .Cast<Enum>()
             .Select(value =>
             {
+                var displayAttr = value.GetAttributeOfType<DisplayAttribute>();
+                var displayAttrValue0= value.GetAttributeOfType<DisplayAttribute>()?.GetName()??"no attr display name 0";
+                var displayAttrValue=value.GetType().GetField(value.ToString()).GetCustomAttribute<DisplayAttribute>()?.Name??"no attr display";
+                
                 //var fieldInfo = value.GetType().GetField(value.ToString());
                 //var displayAttribute = fieldInfo?.GetCustomAttributes(typeof(DisplayAttribute), false)
                 //    .OfType<DisplayAttribute>()
                 //    .FirstOrDefault();
-                return new KeyValueItem(Convert.ToInt16(value),$"{value}:{value.GetDisplayName()}");
+                return new KeyValueItem(Convert.ToInt16(value),$"{value}:{value.GetDisplayName()},{displayAttrValue0},{displayAttrValue}");
                 //dicResult.Add(int.Parse(value?.ToString() ?? "0"), displayAttribute?.Name ?? "");
                 //return displayAttribute != null ? displayAttribute.Name : value.ToString();
             }).ToList();
@@ -104,18 +108,14 @@ app.MapGet("/enums/myenum2-by-names", () =>
 });
 app.MapGet("/enums/myenum2-labels", () =>
 {
-
-    //IEnumerable<string> getEnumAsList(Type enumType)
-    ////IEnumerable<string> getEnumAsList(Type enumType)
-    //{
     //Assembly assembly = typeof(MyEnum02).Assembly;  
     //Assembly assembly = Assembly.GetExecutingAssembly();
     //var enums = AppDomain.CurrentDomain.GetAssemblies()
     //      .Where(x => x.FullName.Contains("Csis.CulturalCamp.Domain")).FirstOrDefault()
     //      .GetTypes().Where(t => t.GetCustomAttributes(typeof(CsisEnumConditionAttribute), false).Any());
 
-    Assembly assembly = Assembly.GetExecutingAssembly();
-    var enums = assembly.GetTypes().Where(t => t.IsEnum);
+    Assembly assembly = Assembly.GetExecutingAssembly();//AppDomain.CurrentDomain.GetAssemblies()//
+    var enums = assembly.GetTypes().Where(t => t.IsEnum );
 
     var enumsData = enums.Select(e =>
     {
